@@ -62,38 +62,38 @@ int main(int argc, char** argv) {
     set_total_branches(fd.size());
     
     // Run prediction algorithms
-    // correct_output.push_back(always_taken(fd));
+    correct_output.push_back(always_taken(fd));
 
-    // correct_output.push_back(always_not_taken(fd));
+    correct_output.push_back(always_not_taken(fd));
 
-    // correct_output.push_back(bimodal(1, 16, fd));
-    // correct_output.push_back(bimodal(1, 32, fd));
-    // correct_output.push_back(bimodal(1, 128, fd));
-    // correct_output.push_back(bimodal(1, 256, fd));
-    // correct_output.push_back(bimodal(1, 512, fd));
-    // correct_output.push_back(bimodal(1, 1024, fd));
-    // correct_output.push_back(bimodal(1, 2048, fd));
+    correct_output.push_back(bimodal(1, 16, fd));
+    correct_output.push_back(bimodal(1, 32, fd));
+    correct_output.push_back(bimodal(1, 128, fd));
+    correct_output.push_back(bimodal(1, 256, fd));
+    correct_output.push_back(bimodal(1, 512, fd));
+    correct_output.push_back(bimodal(1, 1024, fd));
+    correct_output.push_back(bimodal(1, 2048, fd));
 
-    // correct_output.push_back(bimodal(3, 16, fd));
-    // correct_output.push_back(bimodal(3, 32, fd));
-    // correct_output.push_back(bimodal(3, 128, fd));
-    // correct_output.push_back(bimodal(3, 256, fd));
-    // correct_output.push_back(bimodal(3, 512, fd));
-    // correct_output.push_back(bimodal(3, 1024, fd));
-    // correct_output.push_back(bimodal(3, 2048, fd));
+    correct_output.push_back(bimodal(3, 16, fd));
+    correct_output.push_back(bimodal(3, 32, fd));
+    correct_output.push_back(bimodal(3, 128, fd));
+    correct_output.push_back(bimodal(3, 256, fd));
+    correct_output.push_back(bimodal(3, 512, fd));
+    correct_output.push_back(bimodal(3, 1024, fd));
+    correct_output.push_back(bimodal(3, 2048, fd));
 
 
-    // correct_output.push_back(gshare(3, fd));
-    // correct_output.push_back(gshare(4, fd));
-    // correct_output.push_back(gshare(5, fd));
-    // correct_output.push_back(gshare(6, fd));
-    // correct_output.push_back(gshare(7, fd));
-    // correct_output.push_back(gshare(8, fd));
-    // correct_output.push_back(gshare(9, fd));
-    // correct_output.push_back(gshare(10, fd));
-    // correct_output.push_back(gshare(11, fd));
+    correct_output.push_back(gshare(3, fd));
+    correct_output.push_back(gshare(4, fd));
+    correct_output.push_back(gshare(5, fd));
+    correct_output.push_back(gshare(6, fd));
+    correct_output.push_back(gshare(7, fd));
+    correct_output.push_back(gshare(8, fd));
+    correct_output.push_back(gshare(9, fd));
+    correct_output.push_back(gshare(10, fd));
+    correct_output.push_back(gshare(11, fd));
 
-    // correct_output.push_back(tournament(fd));
+    correct_output.push_back(tournament(fd));
 
     branch_target_buffer(fd);
     // Output results to file
