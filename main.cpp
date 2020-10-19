@@ -39,6 +39,8 @@ int tournament(const vector<input_data> &fd);
 int adjust_selector_counter(int p1c, int p2c, int counter);
 int correct_selector(int counter, int gshare_correct, int bimodal_correct);
 
+int branch_target_buffer(const vector<input_data> &fd);
+
 void set_total_branches(int tb);
 
 int main(int argc, char** argv) {
@@ -91,8 +93,9 @@ int main(int argc, char** argv) {
     // correct_output.push_back(gshare(10, fd));
     // correct_output.push_back(gshare(11, fd));
 
-    correct_output.push_back(tournament(fd));
+    // correct_output.push_back(tournament(fd));
 
+    branch_target_buffer(fd);
     // Output results to file
     output_results(fout, correct_output);
 
@@ -345,7 +348,7 @@ int tournament(const vector<input_data> &fd) {
             cout << i << "/" << fd.size() << endl;
         }
     }
-    return correct;;
+    return correct;
 }
 
 int adjust_selector_counter(int p1c, int p2c, int counter) {
@@ -353,7 +356,7 @@ int adjust_selector_counter(int p1c, int p2c, int counter) {
     if(dif == 1) {
         return min(3, counter + dif);
     } else if (dif == -1) {
-        return max(0, counter - dif);
+        return max(0, counter + dif);
     } else {
         return counter;
     }
@@ -373,6 +376,51 @@ int correct_selector(int counter, int gshare_correct, int bimodal_correct) {
     return correct;
 }
 
+
+int branch_target_buffer(const vector<input_data> &fd) {
+    map<unsigned long long, int> bimodal_table;
+    map<unsigned long long, unsigned long long> btb;
+    int table_size = 512;
+    unsigned long long pc_mask = table_size - 1;
+    unsigned long long pc = 0;
+    int counter_limit = 3;
+    int counter_len = 2;
+    int bimodal_correct = 0;
+    int correct = 0;
+    int branches_taken = 0;
+    for (int i=0; i<fd.size(); i++) {
+        pc = fd[i].pc & pc_mask;
+        btb[pc] = fd[i].target;
+        if (fd[i].is_taken) {
+            branches_taken++;
+        }
+    }
+    for (int i=0; i<fd.size(); i++) {
+        bimodal_correct = 0;
+
+        pc = fd[i].pc & pc_mask;
+
+        // Bimodal predictor---------------------------------------------------------------
+        
+        // Check if predictor is correct
+        bimodal_correct = correct_branch(bimodal_table[pc], fd[i].is_taken, counter_len);
+        // Adjust bimodal counter
+        bimodal_table[pc] = adjust_counter(fd[i].is_taken, counter_limit, bimodal_table[pc]);
+
+        if(fd[i].is_taken && bimodal_correct) {
+            if(btb[pc] == fd[i].pc) {
+                correct++;
+            }
+        }
+        if (fd[i].is_taken){
+            btb[pc] = fd[i].pc;
+
+        }
+    }
+    cout << "correct: " << correct << "/" << branches_taken << endl;
+
+    return correct;
+}
 void output_results(ofstream &fout, vector<int> correct_output){
     int result_count = correct_output.size();
 
