@@ -11,7 +11,7 @@ using namespace std;
 
 // global variables
 int total_branches;
-
+int total_btb;
 struct input_data {
     unsigned long long pc;
     unsigned long long target;
@@ -62,9 +62,13 @@ int main(int argc, char** argv) {
     set_total_branches(fd.size());
     
     // Run prediction algorithms
+    cout << "running always taken predictor" << endl;
     correct_output.push_back(always_taken(fd));
 
+    cout << "running always not taken predictor" << endl;
     correct_output.push_back(always_not_taken(fd));
+
+    cout << "running bimodal 1 bit predictors" << endl;
 
     correct_output.push_back(bimodal(1, 16, fd));
     correct_output.push_back(bimodal(1, 32, fd));
@@ -74,6 +78,7 @@ int main(int argc, char** argv) {
     correct_output.push_back(bimodal(1, 1024, fd));
     correct_output.push_back(bimodal(1, 2048, fd));
 
+    cout << "running bimodal 2 bit predictors" << endl;
     correct_output.push_back(bimodal(3, 16, fd));
     correct_output.push_back(bimodal(3, 32, fd));
     correct_output.push_back(bimodal(3, 128, fd));
@@ -82,7 +87,7 @@ int main(int argc, char** argv) {
     correct_output.push_back(bimodal(3, 1024, fd));
     correct_output.push_back(bimodal(3, 2048, fd));
 
-
+    cout << "running gshare predictors" << endl;
     correct_output.push_back(gshare(3, fd));
     correct_output.push_back(gshare(4, fd));
     correct_output.push_back(gshare(5, fd));
@@ -93,9 +98,12 @@ int main(int argc, char** argv) {
     correct_output.push_back(gshare(10, fd));
     correct_output.push_back(gshare(11, fd));
 
+    cout << "running tournament predictor" << endl;
     correct_output.push_back(tournament(fd));
 
-    branch_target_buffer(fd);
+    cout << "running branch target buffer" << endl;
+
+    correct_output.push_back(branch_target_buffer(fd));
     // Output results to file
     output_results(fout, correct_output);
 
@@ -339,14 +347,6 @@ int tournament(const vector<input_data> &fd) {
 
         // Adjust selector counter
         selector_table[pc] = adjust_selector_counter(bimodal_correct, gshare_correct, selector_table[pc]);
-        // if(bimodal_correct && !gshare_correct) {
-        //     int selector_counter = selector_table[pc];
-        //     cout << "pc at" << pc << "+1";
-        // }
-        // For testing only
-        if (i % 10000 == 0) {
-            cout << i << "/" << fd.size() << endl;
-        }
     }
     return correct;
 }
@@ -375,7 +375,6 @@ int correct_selector(int counter, int gshare_correct, int bimodal_correct) {
     }
     return correct;
 }
-
 
 int branch_target_buffer(const vector<input_data> &fd) {
     map<unsigned long long, int> bimodal_table;
@@ -417,16 +416,16 @@ int branch_target_buffer(const vector<input_data> &fd) {
 
         }
     }
-    cout << "correct: " << correct << "/" << branches_taken << endl;
-
+    total_btb = branches_taken;
     return correct;
 }
+
 void output_results(ofstream &fout, vector<int> correct_output){
     int result_count = correct_output.size();
 
     int i;
     vector<int> end_line = {0, 1, 8, 15, 24, 25, 26};
-    for(i=0; i<result_count; i++){
+    for(i=0; i<result_count-1; i++){
         fout << correct_output[i] << "," << total_branches;
 
 
@@ -436,6 +435,8 @@ void output_results(ofstream &fout, vector<int> correct_output){
             fout << "; ";
         }
     }
+
+    fout << correct_output.back() << "," << total_btb << ";" << endl;
 }
 
 void set_total_branches(int tb){
